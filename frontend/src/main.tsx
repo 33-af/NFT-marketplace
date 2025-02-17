@@ -2,21 +2,21 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import './index.module.scss'
 import App from './App.tsx'
-import { AuthProvider } from './context/authContenxt.tsx'; 
-import { UserInfoProvider } from './context/UserInfo.tsx';
-import { FavoritesProvider } from './context/favorites.tsx';
-import { UpdateNftProvider } from './context/nftContext.tsx';
+// import { AuthProvider } from './context/authContenxt.tsx'; 
+// import { UserInfoProvider } from './context/UserInfo.tsx';
+// import { FavoritesProvider } from './context/favorites.tsx';
+// import { UpdateNftProvider } from './context/nftContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
-            <AuthProvider>
+            {/* <AuthProvider>
                 <UserInfoProvider>
                     <FavoritesProvider>
-                        <UpdateNftProvider>
+                        <UpdateNftProvider> */}
                             <App />
-                        </UpdateNftProvider>
+                        {/* </UpdateNftProvider>
                     </FavoritesProvider>
                 </UserInfoProvider>
-            </AuthProvider>
+            </AuthProvider> */}
     </BrowserRouter>
 )

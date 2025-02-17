@@ -1,142 +1,15 @@
 import s from './Create.module.scss';
 import nft from "../../assets/MultipleNft.png"
 import removeIcon from '../../assets/removeIcon.png'
-import axios, { AxiosError } from 'axios'
-import { useState } from 'react';
-import { IAddNft } from '../../types/NftType';
-import { useNavigate } from 'react-router';
-import { toast } from 'react-toastify';
+
 
 
 const Create = () => {
-    const [isChecked, setIsChecked] = useState(false);
-    const [image, setImage] = useState<File | null>(null);
-    const navigate = useNavigate();
-    const [data, setData] = useState<IAddNft>({
-        name: "",
-        description: "",
-        price: 0,
-        auctionEndTime: null, 
-        collection: "",
-    });
-
-
-    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-
-        if (name === "auctionEndTime") {
-            const localDate = new Date(value);  
-            const utcDate = new Date(Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate()));  
-            setData((prevData) => ({
-                ...prevData,
-                auctionEndTime: utcDate,  
-            }));
-        } else {
-            setData((prevData) => ({ ...prevData, [name]: value }));
-        }
-    };
-
-    const handleCheckeCheckbox = () => {
-        setIsChecked(!isChecked);
-    };
-
-    const onSubmitHandler = async (e: React.FormEvent) => {
-        e.preventDefault();
-      
-     
-        if (!data.name || !data.description || !data.price || !data.auctionEndTime) {
-          toast.error("Please fill in all fields!");
-          return;
-        }
-      
-        const token = localStorage.getItem("token");
-        if (!token) {
-          toast.error("No token found! You need to be logged in.");
-          return;
-        }
-      
-        const sendPayload = async (payload: any) => {
-          try {
-            const response = await axios.post(
-              "https://nft-market-as0q.onrender.com/nfts",
-              payload,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-            console.log("Data sent successfully:", response.data);
-            if (response.status === 201) {
-              setImage(null);
-              setData({
-                name: "",
-                description: "",
-                price: 0,
-                auctionEndTime: new Date(), 
-                collection: "",
-              });
-              navigate("/");
-              toast.success("You create new NFT, please wait ")
-            }
-          } catch (e: unknown) {
-            if (e instanceof AxiosError) {
-              console.error(
-                "Error sending data:",
-                e.response ? e.response.data : e.message
-              );
-            } else {
-              console.error("Unknown error:", e);
-            }
-            toast.error("There was an error sending your data.");
-          }
-        };
-      
-        if (image) {
-          const reader = new FileReader();
-          reader.readAsDataURL(image);
-          reader.onloadend = async () => {
-            const base64Image = reader.result as string;
-            const payload: any = {
-              name: data.name,
-              description: data.description,
-              price: data.price,
-              auctionEndTime: (data.auctionEndTime instanceof Date
-                ? data.auctionEndTime
-                : new Date(data.auctionEndTime!)
-              ).toISOString(),
-              image: base64Image,
-            };
-            if (data.collection && data.collection !== "Create collection") {
-              payload.collection = data.collection;
-            }
-            console.log("Payload:", payload);
-            await sendPayload(payload);
-          };
-        } else {
-          const payload: any = {
-            name: data.name,
-            description: data.description,
-            price: data.price,
-            auctionEndTime: (data.auctionEndTime instanceof Date
-              ? data.auctionEndTime
-              : new Date(data.auctionEndTime!)
-            ).toISOString(),
-            image: undefined,
-          };
-          if (data.collection && data.collection !== "Create collection") {
-            payload.collection = data.collection;
-          }
-          console.log("Payload:", payload);
-          await sendPayload(payload);
-        }
-      };
-      
+ 
     return (
         <section className={s.createPage}>
             <div className={s.container}>
-                <form onSubmit={onSubmitHandler} className={s.createPageContent}>
+                <form className={s.createPageContent}>
                     <div className={s.leftContent}>
                         <div className={s.contentTop}>
                             <p className={s.contentTitle}>Create single collectible</p>
@@ -149,7 +22,6 @@ const Create = () => {
                         <div className={s.uploadContent}>
                             <input
                                 type="file"
-                                onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
                                 className={s.fileInput}
                             />
                         </div>
@@ -157,8 +29,7 @@ const Create = () => {
                         <div className={s.detailsBlock}>
                             <label htmlFor="name"  >ITEM NAME</label>
                             <input
-                                onChange={onChangeHandler}
-                                value={data.name}
+                             
                                 type="text"
                                 name='name'
                                 id='name'
@@ -169,8 +40,6 @@ const Create = () => {
                         <div className={s.detailsBlock}>
                             <label htmlFor="description" >DESCRIPTION</label>
                             <input
-                                onChange={onChangeHandler}
-                                value={data.description}
                                 type="text"
                                 name='description'
                                 id='description'
@@ -185,8 +54,6 @@ const Create = () => {
                                 type="date"
                                 id="start"
                                 name="auctionEndTime"
-                                value={data.auctionEndTime ? data.auctionEndTime.toISOString().split("T")[0] : ""} 
-                                onChange={onChangeHandler}
                                 min="2025-02-09"
                                 max="2030-02-09"
                             />
@@ -196,15 +63,9 @@ const Create = () => {
                                 <h3>Instant sale price</h3>
                                 <p>Enter the price for which the item will be instantly sold</p>
                             </div>
-                            <input type="checkbox" className={s.detailsInfoField} onChange={handleCheckeCheckbox}
-                                checked={isChecked} />
+                          
                         </div>
-                        {isChecked && (
-                            <input
-                                onChange={onChangeHandler}
-                                value={data.price}
-                                type="number" placeholder="Enter price" name='price' className={s.detailsCheckedInput} />
-                        )}
+                     
                         <div className={s.detailsCollection}>
                             <button type='submit' className={s.createNft}>
                                 Create item
@@ -215,7 +76,7 @@ const Create = () => {
                         <div className={s.rightBlock}>
                             <h3 className={s.previewTitle}>Preview</h3>
                             <img
-                                src={image ? URL.createObjectURL(image) : nft}
+                                src={nft}
                                 alt="uploaded-preview"
                                 className={s.previeImg}
                             />

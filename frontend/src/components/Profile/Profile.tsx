@@ -4,72 +4,22 @@ import globeIcon from '../../assets/globe.svg';
 import facebookIcon from '../../assets/facebook.svg';
 import twitterIcon from '../../assets/twitter.svg';
 import instagramIcon from '../../assets/Instagram.svg';
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { IProfile } from '../../types/profileType';
-import { useAuth } from '../../context/authContenxt';
-import { useInfo } from '../../context/UserInfo';
-import { toast } from 'react-toastify';
+import { Link, NavLink, Outlet } from 'react-router-dom';
+import avatar from '../../assets/avatar.png'
 
 const Profile = () => {
-  const { username, email } = useInfo();
-  const { token } = useAuth(); 
-  const [profileData, setProfileData] = useState<IProfile | null>(null);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.pathname === "/profile") {
-      navigate("/profile/on-sale", { replace: true });
-    }
-  }, [location.pathname, navigate]);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (!token) {
-        toast.error('No token found!');
-        return;
-      }
-
-      try {
-        const response = await axios.get<IProfile>(
-          "https://nft-market-as0q.onrender.com/auth/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-
-        console.log('Profile data:', response.data);
-        setProfileData(response.data.data);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.error("Axios error:", error.response?.data);
-          console.error("Status code:", error.response?.status);
-        } else {
-          console.error("Unexpected error:", error);
-        }
-      }
-    };
-
-    fetchProfile();
-  }, [token, username]);
-
-
+  
   return (
     <section className={s.container}>
       <div className={s.profile}>
         <aside className={s.aside}>
           <div className={s.profileBlock}>
-            <img src={profileData?.profileImage} alt="User" className={s.profileUserLogo} />
+            <img src={avatar} alt="User" className={s.profileUserLogo} />
 
             <div className={s.profileBlockInfo}>
-              <h2 className={s.profileName}>{username}</h2>
+              <h2 className={s.profileName}>Username</h2>
               <div className={s.profileQrcode}>
-                <p className={s.qrcode}>{email}</p>
+                <p className={s.qrcode}>Email</p>
                 <img src={coins} alt="Coins" className={s.profileQrcodeImage} />
               </div>
               <p className={s.profileUserDescription}>Description here</p>
@@ -88,7 +38,7 @@ const Profile = () => {
             </div>
 
             <span className={s.profileLine}></span>
-            <p className={s.profileDate}>Member since {profileData?.dateJoined || "Unknown"}</p>
+            <p className={s.profileDate}>Member since </p>
           </div>
         </aside>
 

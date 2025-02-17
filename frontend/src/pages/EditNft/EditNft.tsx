@@ -1,108 +1,13 @@
 import s from './EditNFt.module.scss';
 import nft from "../../assets/MultipleNft.png"
 import removeIcon from '../../assets/removeIcon.png'
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
-import { useNft } from '../../context/nftContext';
-
-interface IAddNft {
-  name: string;
-  description: string;
-  price: number;
-  auctionEndTime: Date | string | null;
-  data?: any;
-  image: string | File | null;
-}
 
 const EditNft = () => {
-  const { name, description, price, auctionEndTime,  image, updateNFT } = useNft();
-  const [isChecked, setIsChecked] = useState(false);
-  const { id } = useParams();
-  const [data, setData] = useState<IAddNft>({
-    name: "",
-    description: "",
-    price: 0,
-    auctionEndTime: null,
-    image: ""
-  });
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  console.log(name)
-  console.log(description)
-  console.log(price)
-  console.log(auctionEndTime)
-  console.log(image)
-
-  useEffect(() => {
-    setData({
-      name: name,
-      description: description,
-      price: price,
-      auctionEndTime: auctionEndTime ? new Date(auctionEndTime) : null,
-      image: image
-    });
-  
-  }, [name, description, price, auctionEndTime, image]);
-
-  const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === "auctionEndTime") {
-      const localDate = new Date(value);
-      setData((prevData) => ({
-        ...prevData,
-        auctionEndTime: localDate,
-      }));
-    } else {
-      setData((prevData) => ({ ...prevData, [name]: value }));
-    }
-  };
-
-  const handleCheckeCheckbox = () => {
-    setIsChecked(!isChecked);
-  };
-
-  const onSubmitHandler = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    if (!id) {
-      alert("Error: ID not defined");
-      return;
-    }
-  
-
-    const isoDate = new Date(data.auctionEndTime).toISOString();
-  
-    if (selectedImage) {
-      const reader = new FileReader();
-      reader.readAsDataURL(selectedImage);
-      reader.onloadend = async () => {
-        const base64Image = reader.result as string;
-        await updateNFT(
-          id,
-          data.name,
-          data.description,
-          data.price,
-          isoDate,
-          base64Image,
-        );
-      };
-      console.log("Pre-update data:", data);
-      console.log("Sending updateNFT");
-    } else {
-      await updateNFT(
-        id,
-        data.name,
-        data.description,
-        data.price,
-        isoDate,
-        typeof data.image === "string" ? data.image : null,
-      );
-    }
-  };
 
   return (
     <section className={s.createPage}>
       <div className={s.container}>
-        <form onSubmit={onSubmitHandler} className={s.createPageContent}>
+        <form className={s.createPageContent}>
           <div className={s.leftContent}>
             <div className={s.contentTop}>
               <p className={s.contentTitle}>Update NFT</p>
@@ -112,9 +17,6 @@ const EditNft = () => {
             <div className={s.uploadContent}>
               <input
                 type="file"
-                onChange={(e) =>
-                  setSelectedImage(e.target.files ? e.target.files[0] : null)
-                }
                 className={s.fileInput}
               />
             </div>
@@ -122,8 +24,6 @@ const EditNft = () => {
             <div className={s.detailsBlock}>
               <label htmlFor="name">ITEM NAME</label>
               <input
-                onChange={onChangeHandler}
-                value={data.name}
                 type="text"
                 name="name"
                 id="name"
@@ -134,8 +34,6 @@ const EditNft = () => {
             <div className={s.detailsBlock}>
               <label htmlFor="description">DESCRIPTION</label>
               <input
-                onChange={onChangeHandler}
-                value={data.description}
                 type="text"
                 name="description"
                 id="description"
@@ -150,17 +48,6 @@ const EditNft = () => {
                 type="date"
                 id="start"
                 name="auctionEndTime"
-                value={
-                  data.auctionEndTime
-                    ? (data.auctionEndTime instanceof Date
-                      ? data.auctionEndTime
-                      : new Date(data.auctionEndTime)
-                    )
-                      .toISOString()
-                      .split("T")[0]
-                    : ""
-                }
-                onChange={onChangeHandler}
                 min="2025-02-09"
                 max="2030-02-09"
               />
@@ -173,20 +60,9 @@ const EditNft = () => {
               <input
                 type="checkbox"
                 className={s.detailsInfoField}
-                onChange={handleCheckeCheckbox}
-                checked={isChecked}
+
               />
             </div>
-            {isChecked && (
-              <input
-                onChange={onChangeHandler}
-                value={data.price}
-                type="number"
-                placeholder="Enter price"
-                name="price"
-                className={s.detailsCheckedInput}
-              />
-            )}
             <div className={s.detailsCollection}>
               <button type="submit" className={s.createNft} >
                 Update NFT
@@ -197,13 +73,7 @@ const EditNft = () => {
             <div className={s.rightBlock}>
               <h3 className={s.previewTitle}>Preview</h3>
               <img
-                src={
-                  selectedImage
-                    ? URL.createObjectURL(selectedImage)
-                    : typeof image === "string" && image
-                      ? image
-                      : nft
-                }
+                src={nft}
                 alt="uploaded-preview"
                 className={s.previeImg}
               />
@@ -223,6 +93,6 @@ const EditNft = () => {
   );
 };
 
-export default EditNft; 
+export default EditNft;
 
 

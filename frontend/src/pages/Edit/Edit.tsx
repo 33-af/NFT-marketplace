@@ -3,80 +3,8 @@ import s from './Edit.module.scss'
 import avatar from '../../assets/avatar.png';
 import plusIcon from '../../assets/plus.png';
 import removeIcon from '../../assets/removeIcon.png'
-import { useAuth } from '../../context/authContenxt';
-import { useEffect, useState } from 'react';
-import { IProfile } from '../../types/profileType';
-import axios from 'axios';
-import { useInfo } from '../../context/UserInfo';
-import { toast } from 'react-toastify';
 
 const Edit = () => {
-    const { username, updateUsername } = useInfo();
-    const [localUsername, setLocalUsername] = useState(username);
-    const { token } = useAuth();
-
-    useEffect(() => {
-        setLocalUsername(username);
-    }, [username]);
-
-    useEffect(() => {
-        const fetchProfile = async () => {
-            if (!token) {
-                toast.error('No token found!');
-                return;
-            }
-
-            try {
-                const response = await axios.get<IProfile>(
-                    "https://nft-market-as0q.onrender.com/auth/profile",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-
-                console.log('Profile data:', response.data);
-
-                updateUsername(response.data.data.username || ""); 
-            } catch (error) {
-                console.error("Error fetching profile:", error);
-            }
-        };
-
-        fetchProfile();
-    }, [token]);
-
-    const handleUpdateProfile = async () => {
-        if (!token) return;
-
-        try {
-            const response = await axios.put(
-                "https://nft-market-as0q.onrender.com/auth/profile",
-                { username: localUsername },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-            if(response.status === 200){
-                toast.success("You succesfully updated  your Profile,  please  wait")
-            }
-
-            console.log('Profile updated:', response.data);
-            updateUsername(response.data.data.username || "");
-
-            const profileResponse = await axios.get("https://nft-market-as0q.onrender.com/auth/profile", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            updateUsername(profileResponse.data.data.username || "");
-        } catch (error) {
-            console.error("Error updating profile:", error);
-        }
-    };
 
     return (
         <>
@@ -114,8 +42,6 @@ const Edit = () => {
                                             id="username"
                                             name="displayName"
                                             className={s.formInput}
-                                            value={localUsername} 
-                                            onChange={(e) => setLocalUsername(e.target.value)}  
                                             placeholder="Enter your display name"
                                         />
                                     </div>
@@ -158,7 +84,7 @@ const Edit = () => {
                                     </p>
                                     <span className={s.editpageLine}></span>
                                     <div className={s.editButtons}>
-                                        <button type='button' className={s.updateButton} onClick={handleUpdateProfile}>
+                                        <button type='button' className={s.updateButton}>
                                             Update Profile
                                         </button>
                                         <button type='button' className={s.clearButton}>

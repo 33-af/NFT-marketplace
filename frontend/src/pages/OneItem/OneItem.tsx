@@ -1,167 +1,20 @@
 import s from "./OneItem.module.scss";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import { INft } from "../../types/NFT";
 import editIcon from "../../assets/editIcon.svg";
 import addIcon from "../../assets/addIcon.svg";
 import heart from "../../assets/heart.svg";
-import redHert from "../../assets/red-heart.png";
-import binIcon from "../../assets/bin.svg";
-import { useAuth } from "../../context/authContenxt";
-import { useFavorites } from "../../context/favorites";
-import { useInfo } from "../../context/UserInfo";
-import { useNft } from "../../context/nftContext";
-import ModalBid from "../../components/modalBid/modalBid";
-import ModalAuction from "../../components/ModalAuction/ModalAuction";
-import ModalToken from "../../components/ModalToken/ModalToken";
-import { toast } from "react-toastify";
-
+import binIcon from "../../assets/bin.svg";;
+import nftImage from '../../assets/nft-image.png'
+import nftAvatar from '../../assets/avatar.png'
 
 const OneItem: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const [nftData, setNft] = useState<INft | null>(null);
-    const [isFavorite, setIsFavorite] = useState<boolean>(false);
-    const { token } = useAuth();
-    const { addFavorite, getFavorites, removeFavorite } = useFavorites();
-    const navigate = useNavigate();
-    const { avatar, username, userId } = useInfo();
-    const currentBid = localStorage.getItem("newBidPrice");
-    const bidder = localStorage.getItem("bidder");
-    const {
-        isOpenModalAuction,
-        setIsOpenModalAuction,
-        fetchGetNftAuction,
-        price,
-        _id,
-        auctionEndTime,
-        isOpenBidAuction,
-        setIsOpenBidAuction,
-        isOpenBuyModal,
-        setIsOpenBuyModal,
-        fetchGetNftData,
-    } = useNft();
-
-    const nft = _id;
-    const startingPrice = price;
-    const endTime = auctionEndTime;
-
-    useEffect(() => {
-        const fetchNftDetail = async () => {
-            try {
-                const response = await axios.get(`https://nft-market-as0q.onrender.com/nfts/${id}`);
-                setNft(response.data.data);
-            } catch (error) {
-                console.error("Error fetching NFT detail:", error);
-            }
-        };
-
-        if (id) {
-            fetchNftDetail();
-        }
-    }, [id]);
-
-    useEffect(() => {
-        const favoritesImage = getFavorites();
-        setIsFavorite(favoritesImage.some((fav) => fav._id === id));
-    }, [id, getFavorites]);
-
-    const handleClick = async () => {
-        if (!token) {
-            navigate("/register");
-            return;
-        }
-
-        try {
-            if (isFavorite) {
-                const response = await axios.post(
-                    `https://nft-market-as0q.onrender.com/nfts/${id}/unlike`,
-                    {},
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-
-                if (response.status === 200 && id) {
-                    removeFavorite(id);
-                    toast.success("You removed from favorite");
-                }
-                setNft(response.data.data);
-            } else {
-                const response = await axios.post(
-                    `https://nft-market-as0q.onrender.com/nfts/${id}/like`,
-                    {},
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-
-                if (response.status === 200) {
-                    addFavorite(response.data);
-                    toast.success("You add this NFT to favorite");
-                }
-            }
-        } catch (error) {
-            console.error("Error when updating favorites:", error);
-        }
-    };
-
-    const handleDeleteNft = async () => {
-        if (!token) {
-            alert("You don't have a token");
-            return;
-        }
-
-        if (!id) {
-            console.error("NFT ID not found");
-            return;
-        }
-
-        try {
-            const response = await axios.delete(
-                `https://nft-market-as0q.onrender.com/nfts/${id}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            if (response.status === 200) {
-                removeFavorite(id);
-                toast.success("You successful delete this NFT");
-                navigate("/profile");
-            }
-            setNft(response.data.data);
-        } catch (error) {
-            console.error("Error when updating favorites:", error);
-        }
-    };
-
-
-
-    const handleAddBid = () => {
-        if (!token) {
-            alert("You have not token");
-        }
-
-        try {
-            setIsOpenBidAuction(true);
-        } catch (e) {
-            alert(e);
-        }
-    };
-
-    const handleBuyNft = () => {
-        if (!token) {
-            alert("You have not token");
-        }
-        try {
-            setIsOpenBuyModal(true);
-        } catch (e) {
-            alert(e);
-        }
-    };
-
+ 
     return (
         <section className={`${s.oneItem} ${s.container}`}>
-            <img src={nftData?.image} alt={nftData?.name} className={s.oneItem__image} />
+            <img src={nftImage} alt="NFT Image" className={s.oneItem__image} />
             <div className={s.oneItem__info}>
-                <h1>{nftData?.name}</h1>
+                <h1>NFT Title</h1>
                 <div className={s.pricesAndStock}>
-                    <div className={s.discover__card__price}>{nftData?.price} BTC</div>
+                    <div className={s.discover__card__price}> BTC</div>
                     <div className={s.pricesAndStock__inStock}>10 in stock</div>
                 </div>
                 <div className={s.oneItem__desc}>
@@ -177,69 +30,43 @@ const OneItem: React.FC = () => {
                 </div>
                 <div className={s.highestBid}>
                     <div className={s.highestBid__head}>
-                        <img src={avatar} alt="" />
+                        <img src={nftAvatar} alt="" />
                         <div className={s.bidInfo}>
                             <div className={s.bidInfo__head}>
-                                Highest bid by <span className={s.name}>{ userId === bidder ? username : "Not bids yet" }
+                                Highest bid by <span className={s.name}>None
 
                                 </span>
                             </div>
                             <div className={s.bidInfo__price}>
-                                <span className={s.ethereum}>{currentBid} BTC</span>
+                                <span className={s.ethereum}>BTC</span>
                             </div>
                         </div>
                     </div>
                     <div className={s.highestBid__buttons}>
-                        <button className={s.button_blue} onClick={handleBuyNft}>Purchase now</button>
-                        <button className={s.button_dark} onClick={handleAddBid} type="button">Place a bid</button>
+                        <button className={s.button_blue} >Purchase now</button>
+                        <button className={s.button_dark}  type="button">Place a bid</button>
                     </div>
                     <div className={s.highestBid__bottom}>
                         <span>Service fee</span>
                         <span className={s.whiteText}>1.5%</span>
-                        <span>{currentBid} ETH</span>
+                        <span> ETH</span>
                     </div>
                 </div>
             </div>
             <div className={s.buttons}>
-                <button className={s.buttons__button} onClick={() => id && fetchGetNftAuction(id)}>
+                <button className={s.buttons__button}>
                     <img src={addIcon} alt="" className={s.addBudAuction} />
                 </button>
-                <button className={s.buttons__button} onClick={handleDeleteNft}>
+                <button className={s.buttons__button}>
                     <img src={binIcon} alt="" className={s.deleteIcon} />
                 </button>
-                <button className={s.buttons__button} onClick={handleClick}>
-                    <img src={isFavorite ? redHert : heart} alt="" />
+                <button className={s.buttons__button}>
+                    <img src={heart} alt="" />
                 </button>
-                <button className={s.buttons__button} onClick={() => id && fetchGetNftData(id)}>
+                <button className={s.buttons__button}>
                     <img src={editIcon} alt="" className={s.editIcon} />
                 </button>
             </div>
-
-            {
-                isOpenModalAuction && (
-                    <ModalAuction
-                        isOpen={isOpenModalAuction}
-                        onClose={() => setIsOpenModalAuction(false)}
-                        nft={nft}
-                        startingPrice={startingPrice}
-                        endTime={endTime}
-                    />
-                )
-            }
-            {
-                isOpenBidAuction && (
-                    <ModalBid
-                        isOpenBidAuction={isOpenBidAuction}
-                        onClose={() => setIsOpenBidAuction(false)}
-                        startingPrice={startingPrice}
-                    />
-                )
-            }
-            {
-                isOpenBuyModal && (
-                    <ModalToken isOpenBuyModal={isOpenBuyModal} onClose={() => setIsOpenBuyModal(false)} />
-                )
-            }
         </section >
     );
 };

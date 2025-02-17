@@ -5,49 +5,14 @@ import gallery from "../../assets/gallery.svg";
 import lightBulb from "../../assets/lightBulb.svg";
 import disconnect from "../../assets/disconnect.svg";
 import coinsIcon from "../../assets/coinsIcon.svg";
-import { useEffect, useState } from "react";
-import { IProfile } from "../../types/profileType";
-import { useAuth } from "../../context/authContenxt";
-import axios from "axios";
-import { useInfo } from "../../context/UserInfo";
 
 const Wallet = () => {
-    const { token } = useAuth();
-    const {balance} = useInfo()
-    const [profileInfo, setProfileInfo] = useState<IProfile | null>(null);
-    const {walletId} = useAuth();
-    
-
-    useEffect(() => {
-        const fetchProfileInfo = async () => {
-            try {
-                const response = await axios.get<IProfile>(
-                    "https://nft-market-as0q.onrender.com/auth/profile",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                setProfileInfo(response.data.data)
-            } catch (error) {
-                if (axios.isAxiosError(error)) {
-                    console.error("Axios error:", error.response?.data);
-                    console.error("Status code:", error.response?.status);
-                } else {
-                    console.error("Unexpected error:", error);
-                }
-            }
-        };
-        fetchProfileInfo();
-    }, [token])
-
+   
     return (
         <section className={s.myWallet}>
-            <h2>{profileInfo?.username}</h2>
+            <h2>UserName</h2>
             <div className={s.myWallet__link}>
-                {walletId}
+            WalletId
                 <img src={coinsIcon} alt="" />
             </div>
             <div className={s.myWallet__balance}>
@@ -58,7 +23,7 @@ const Wallet = () => {
                             Balance
                         </div>
                         <div className={s.myWallet__balance__value}>
-                        {balance} BTC
+                        Balance BTC
                         </div>
                     </div>
                 </div>
